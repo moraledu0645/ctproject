@@ -1,5 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as htmlviewer
+st.set_page_config(layout='wide', page_title='Hamburger maker!')
 st.title('This is Jia Webpage')
 
 with open('./hamburger.html', 'r', encoding='utf-8') as f:
