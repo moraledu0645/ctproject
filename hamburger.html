@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>햄버거 완성품 예측하기 🍔</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .rule-box {
+      background-color: #f0f0f0;
+      border-left: 5px solid #888;
+      padding: 10px;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+    }
+    select, button {
+      margin: 5px;
+      padding: 5px;
+      font-size: 16px;
+    }
+    .output {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #e6f7ff;
+      border: 1px solid #b3e0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>햄버거 완성품 예측하기 🍔</h1>
+  <h2>대상 및 교과: 중1 (논리적사고)</h2>
+
+  <div class="rule-box">
+<규칙>
+가. 빵 위에는 반드시 소스가 올라감. (단, 덮개 빵 제외)
+나. 토마토는 고기보다는 위, 치즈보다는 아래에 있음.
+다. 양파는 고기와 토마토 사이에 있음.
+라. 고기는 양상추 위에 올라감.
+마. 모든 재료 위에 덮개 빵이 올라가야 함.
+  </div>
+
+  <label>사용할 재료 선택 (아래에서 위 순서로 선택):</label><br>
+  <div id="selectors"></div>
+
+  <br><br>
+  <button onclick="checkBurger()">문제 풀기</button>
+
+  <div class="output" id="result"></div>
+
+  <script>
+    const ingredients = [
+      { label: "선택", value: "" },
+      { label: "양상추 🥬", value: "양상추" },
+      { label: "고기(패티) 🥩", value: "고기" },
+      { label: "치즈 🧀", value: "치즈" },
+      { label: "토마토 🍅", value: "토마토" },
+      { label: "양파 🧅", value: "양파" },
+      { label: "소스 🥫", value: "소스" },
+      { label: "빵 🍞", value: "빵" },
+      { label: "덮개빵 🍞", value: "덮개빵" }
+    ];
+
+    const container = document.getElementById("selectors");
+
+    for (let i = 1; i <= 8; i++) {
+      const select = document.createElement("select");
+      select.id = "ingredient" + i;
+
+      ingredients.forEach(ing => {
+        const option = document.createElement("option");
+        option.value = ing.value;
+        option.textContent = ing.label;
+        select.appendChild(option);
+      });
+
+      container.appendChild(select);
+    }
+
+    function checkBurger() {
+      const selected = [];
+      for (let i = 1; i <= 8; i++) {
+        const val = document.getElementById("ingredient" + i).value;
+        if (val) selected.push(val);
+      }
+
+      const idx = (item) => selected.indexOf(item);
+      const msg = [];
+
+      const required = ["양상추", "고기", "치즈", "토마토", "양파", "소스", "빵", "덮개빵"];
+      const counts = {};
+
+      selected.forEach(item => {
+        counts[item] = (counts[item] || 0) + 1;
+      });
+
+      required.forEach(item => {
+        if (!counts[item]) {
+          msg.push(`❌ 필수 재료 누락: ${item} 이(가) 빠졌습니다.`);
+        } else if (counts[item] > 1) {
+          msg.push(`❌ 재료 중복 사용: ${item} 이(가) ${counts[item]}번 사용되었습니다.`);
+        }
+      });
+
+      if (selected[selected.length - 1] !== "덮개빵")
+        msg.push("❌ 규칙 마: 덮개빵이 맨 위에 있어야 합니다.");
+
+      if (idx("고기") < idx("양상추"))
+        msg.push("❌ 규칙 라: 고기는 양상추 위에 있어야 합니다.");
+
+      if (idx("치즈") >= 0 && idx("토마토") >= 0 && idx("고기") >= 0) {
+        if (!(idx("고기") < idx("토마토") && idx("토마토") < idx("치즈"))) {
+          msg.push("❌ 규칙 나: 토마토는 고기보다 위, 치즈보다 아래에 있어야 합니다.");
+        }
+      }
+
+      if (idx("고기") >= 0 && idx("토마토") >= 0 && idx("양파") >= 0) {
+        const iG = idx("고기"), iT = idx("토마토"), iO = idx("양파");
+        if (!((iG < iO && iO < iT) || (iT < iO && iO < iG))) {
+          msg.push("❌ 규칙 다: 양파는 고기와 토마토 사이에 있어야 합니다.");
+        }
+      }
+
+      for (let i = 0; i < selected.length - 1; i++) {
+        if (selected[i] === "빵" && selected[i + 1] !== "소스") {
+          msg.push("❌ 규칙 가: 빵 위에는 반드시 소스가 있어야 합니다.");
+        }
+      }
+
+      const resultBox = document.getElementById("result");
+      resultBox.innerHTML = msg.length === 0 
+        ? "✅ 정답입니다! 햄버거 완성!" 
+        : msg.join("<br>");
+    }
+  </script>
+
+</body>
+</html>
