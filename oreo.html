@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>오레오 문제 - CT 사고력</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background-color: #f0f0f0;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .image-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .image-box {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .image-box img {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"] {
+      font-size: 18px;
+      padding: 10px;
+      margin-top: 20px;
+      width: 300px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .correct {
+      color: green;
+    }
+
+    .incorrect {
+      color: red;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>오레오 문제를 읽어보자!</h1>
+    <p>왼쪽 이미지를 참고하여 오른쪽 문제를 해석해 보세요.<br>문제에 들어갈 이름을 추론해 입력해 보세요.</p>
+
+    <div class="image-row">
+      <div class="image-box">
+        <div class="label">📌 힌트 이미지</div>
+        <img src="image/oreo.jpeg" alt="오레오 힌트">
+      </div>
+      <div class="image-box">
+        <div class="label">🧩 문제 이미지</div>
+        <img src="image/problem.png" alt="오레오 문제">
+      </div>
+    </div>
+
+    <div>
+      <input type="text" id="answer" placeholder="예: 오레오레오오레">
+      <br>
+      <button onclick="checkAnswer()">제출</button>
+    </div>
+
+    <div class="result" id="resultArea"></div>
+  </div>
+
+  <script>
+    function checkAnswer() {
+      const userAnswer = document.getElementById("answer").value.trim().replace(/\s/g, "");
+      const correctAnswer = "오오오레레오레레오오레오오오레오";
+      const result = document.getElementById("resultArea");
+
+      if (userAnswer === "") {
+        result.textContent = "답을 입력해 주세요!";
+        result.className = "result incorrect";
+      } else if (userAnswer === correctAnswer) {
+        result.textContent = "🎉 축하합니다! 정답입니다 🎉";
+        result.className = "result correct";
+      } else {
+        result.textContent = "❌ 틀렸습니다! 다시 시도해보세요";
+        result.className = "result incorrect";
+      }
+    }
+  </script>
+</body>
+</html>

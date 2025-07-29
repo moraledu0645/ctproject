@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>정보 신뢰도 체크리스트</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      background-color: #f5f8fa;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      font-size: 28px;
+      color: #333;
+    }
+
+    h1 i {
+      margin-right: 10px;
+      color: #2c7be5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 25px;
+      background-color: #fff;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 12px;
+    }
+
+    th {
+      background-color: #eaf0f6;
+    }
+
+    .question {
+      text-align: left;
+    }
+
+    .rating input[type="radio"] {
+      transform: scale(1.2);
+      margin: 0 6px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .stars {
+      font-size: 24px;
+      color: gold;
+      margin-top: 8px;
+    }
+
+    .link-preview {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    input[type="url"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2c7be5;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #1a5fc9;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a2d9d5a54c.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <h1><i class="fas fa-search"></i> 정보 신뢰도 체크리스트</h1>
+
+  <label for="link">확인할 링크(URL) 또는 정보 내용 입력:</label><br />
+  <input type="url" id="link" placeholder="예: https://www.example.com" /><br />
+  <textarea id="info" rows="3" placeholder="또는 정보를 직접 입력하세요"></textarea><br />
+
+  <div id="preview" class="link-preview" style="display: none;">
+    <strong>🔗 링크 미리보기:</strong>
+    <iframe id="iframe" width="100%" height="300px" style="border:none;"></iframe>
+  </div>
+
+  <form id="checklistForm">
+    <table>
+      <thead>
+        <tr>
+          <th>질문 항목</th>
+          <th colspan="5">신뢰도 점수 (1: 매우 낮음 ~ 5: 매우 높음)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="question">1. 출처는 명확하고 신뢰할 수 있나요?<br /><small>(예: 정부, 연구소, 언론기관 등)</small></td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q1" value="1" />1
+            <input type="radio" name="q1" value="2" />2
+            <input type="radio" name="q1" value="3" />3
+            <input type="radio" name="q1" value="4" />4
+            <input type="radio" name="q1" value="5" />5
+          </td>
+        </tr>
+        <tr>
+          <td class="question">2. 정보 제공자의 전문성과 공정성은 어떤가요?</td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q2" value="1" />1
+            <input type="radio" name="q2" value="2" />2
+            <input type="radio" name="q2" value="3" />3
+            <input type="radio" name="q2" value="4" />4
+            <input type="radio" name="q2" value="5" />5
+          </td>
+        </tr>
+        <tr>
+          <td class="question">3. 정보는 최신성을 유지하고 있나요?</td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q3" value="1" />1
+            <input type="radio" name="q3" value="2" />2
+            <input type="radio" name="q3" value="3" />3
+            <input type="radio" name="q3" value="4" />4
+            <input type="radio" name="q3" value="5" />5
+          </td>
+        </tr>
+        <tr>
+          <td class="question">4. 내용은 객관적이며 균형 잡힌 시각을 제공하나요?</td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q4" value="1" />1
+            <input type="radio" name="q4" value="2" />2
+            <input type="radio" name="q4" value="3" />3
+            <input type="radio" name="q4" value="4" />4
+            <input type="radio" name="q4" value="5" />5
+          </td>
+        </tr>
+        <tr>
+          <td class="question">5. 주장을 뒷받침하는 근거나 증거가 제시되어 있나요?</td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q5" value="1" />1
+            <input type="radio" name="q5" value="2" />2
+            <input type="radio" name="q5" value="3" />3
+            <input type="radio" name="q5" value="4" />4
+            <input type="radio" name="q5" value="5" />5
+          </td>
+        </tr>
+        <tr>
+          <td class="question">6. 상업적이거나 특정 의도가 과도하지 않나요?</td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q6" value="1" />1
+            <input type="radio" name="q6" value="2" />2
+            <input type="radio" name="q6" value="3" />3
+            <input type="radio" name="q6" value="4" />4
+            <input type="radio" name="q6" value="5" />5
+          </td>
+        </tr>
+        <tr>
+          <td class="question">7. 다른 신뢰할 수 있는 정보와 비교해보았나요?</td>
+          <td colspan="5" class="rating">
+            <input type="radio" name="q7" value="1" />1
+            <input type="radio" name="q7" value="2" />2
+            <input type="radio" name="q7" value="3" />3
+            <input type="radio" name="q7" value="4" />4
+            <input type="radio" name="q7" value="5" />5
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" onclick="calculateScore()">결과 보기</button>
+  </form>
+
+  <div id="result" style="display: none;">
+    <strong>📊 평균 신뢰도 점수:</strong>
+    <div class="stars" id="stars"></div>
+    <div id="feedback"></div>
+  </div>
+
+  <script>
+    function calculateScore() {
+      const form = document.getElementById('checklistForm');
+      const inputs = form.querySelectorAll('input[type="radio"]:checked');
+      if (inputs.length < 7) {
+        alert("모든 문항에 점수를 선택해주세요.");
+        return;
+      }
+
+      let total = 0;
+      inputs.forEach(input => total += parseInt(input.value));
+      let average = total / 7;
+      document.getElementById("result").style.display = "block";
+      document.getElementById("stars").innerHTML = renderStars(average);
+
+      let feedback = '';
+      if (average >= 4.5) {
+        feedback = "✅ 매우 신뢰할 수 있는 정보입니다.";
+      } else if (average >= 3.5) {
+        feedback = "🔷 신뢰할 수 있는 정보입니다.";
+      } else if (average >= 2.5) {
+        feedback = "⚠️ 어느 정도 신뢰할 수 있지만, 주의가 필요합니다.";
+      } else if (average >= 1.5) {
+        feedback = "❗ 신뢰하기 어려운 정보일 수 있으니 추가 확인이 필요합니다.";
+      } else {
+        feedback = "🚫 신뢰할 수 없는 정보입니다. 다른 출처를 꼭 확인하세요.";
+      }
+
+      document.getElementById("feedback").innerText = feedback;
+    }
+
+    function renderStars(score) {
+      const full = Math.floor(score);
+      const half = score - full >= 0.5;
+      let stars = "";
+      for (let i = 0; i < full; i++) stars += "★";
+      if (half) stars += "⯨"; // 반쪽 별
+      while (stars.length < 5) stars += "☆";
+      return stars;
+    }
+
+    // 링크 미리보기 기능
+    document.getElementById('link').addEventListener('change', function () {
+      const url = this.value.trim();
+      if (url) {
+        document.getElementById("iframe").src = url;
+        document.getElementById("preview").style.display = "block";
+      } else {
+        document.getElementById("preview").style.display = "none";
+        document.getElementById("iframe").src = '';
+      }
+    });
+  </script>
+
+</body>
+</html>
