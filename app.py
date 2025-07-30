@@ -3,8 +3,8 @@ import streamlit.components.v1 as components
 import base64
 import re
 
-st.set_page_config(layout='wide', page_title='Hamburger maker!')
-st.title('This is Jia Webpage')
+st.set_page_config(layout='wide', page_title='CT problem solving program')
+st.markdown("<h1 style='text-align: center; color: black;'>This is Jia Webpage</h1>", unsafe_allow_html=True)
 
 # --------------------
 # 이미지 Base64 인라인 변환 함수
@@ -63,16 +63,16 @@ with col1:
         imgfilepath = './image/gpt.png'
         st.image(imgfilepath)
 
-    with st.expander('Content #2...'):
+    with st.expander('hamburger maker!'):
         components.html(html_hamburger, height=700)
 
-    with st.expander('Content #3...'):
+    with st.expander('Guess the next Oreo!'):
         components.html(html_oreo_inlined, height=1200)
 
-    with st.expander('Content #4...'):
+    with st.expander('Information reliability checklist'):
         components.html(html_checklist, height=1000)
     
-    with st.expander('Content #5...'):
+    with st.expander('What type am I?'):
         components.html(html_test, height=4500)
 
 with col2:
