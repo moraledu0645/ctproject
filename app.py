@@ -45,6 +45,10 @@ html_oreo_inlined = inline_images_in_html(html_oreo, base_path='./')
 with open('./checklist.html', 'r', encoding='utf-8') as f:
     html_checklist = f.read()
 
+# test.html 읽기 (그대로 사용)
+with open('./test.html', 'r', encoding='utf-8') as f:
+    html_test = f.read()
+
 # --------------------
 # 레이아웃 구성
 col1, col2 = st.columns((4,1))
@@ -67,6 +71,9 @@ with col1:
 
     with st.expander('Content #4...'):
         components.html(html_checklist, height=1000)
+    
+    with st.expander('Content #5...'):
+        components.html(html_test, height=4500)
 
 with col2:
     with st.expander('Tips..'):

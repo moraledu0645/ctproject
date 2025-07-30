@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 추천 유형 분석!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif; /* 구글 폰트 적용 */
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        .question-box {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-box:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .question {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .options label {
+            display: block;
+            background-color: #e8f0fe;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-size: 0.95em;
+        }
+        .options label:hover {
+            background-color: #d0e4ff;
+            transform: translateY(-2px);
+        }
+        .options input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 30px;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        #result {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #e6f7ff;
+            border-radius: 10px;
+            border: 1px solid #b3e0ff;
+            text-align: center;
+            display: none; /* 초기에는 숨김 */
+        }
+        #result h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        #result p {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        #recommended-items {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #b3e0ff;
+        }
+        #recommended-items h3 {
+            color: #007bff;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+        .item-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .item-list li {
+            background-color: #ffffff;
+            border: 1px solid #cee7f5;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 1em;
+            color: #555;
+            text-align: left;
+        }
+        .warning-message {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            color: #856404;
+            font-size: 1em;
+            line-height: 1.5;
+            text-align: left;
+            display: flex; /* Flexbox 적용 */
+            align-items: flex-start; /* 아이콘과 텍스트 상단 정렬 */
+        }
+        .warning-message .icon {
+            font-size: 2.5em; /* 아이콘 크기 키움 */
+            margin-right: 15px; /* 아이콘과 텍스트 간격 */
+            color: #f7b600; /* 아이콘 색상 */
+        }
+        .warning-message strong {
+            color: #6a5000;
+            font-size: 1.1em; /* 제목 글씨 크기 키움 */
+            display: block; /* 줄 바꿈 */
+            margin-bottom: 8px; /* 제목과 내용 간격 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>나만의 추천 유형 분석! 🤔</h1>
+        <p style="text-align: center; margin-bottom: 30px; color: #666;">아래 질문들에 솔직하게 답하고, 나에게 꼭 맞는 추천 아이템을 받아보세요!</p>
+        <form id="recommendation-test">
+            <div class="question-box">
+                <p class="question">1. 주말에 약속이 없을 때, 당신의 계획은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="A"> 혼자 웹툰 보거나 게임하면서 여유롭게 보낸다.</label>
+                    <label><input type="radio" name="q1" value="B"> 친구들에게 연락해서 뭐 할지 찾아본다.</label>
+                    <label><input type="radio" name="q1" value="C"> 새로운 것을 배우거나 자기계발을 한다.</label>
+                    <label><input type="radio" name="q1" value="D"> 가족과 함께 시간을 보내거나 집안일을 돕는다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">2. 친구들과 대화할 때, 당신의 주된 방식은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="A"> 최근 있었던 흥미로운 사건이나 사실을 공유한다.</label>
+                    <label><input type="radio" name="q2" value="B"> 서로의 감정이나 고민에 대해 깊이 있게 이야기한다.</label>
+                    <label><input type="radio" name="q2" value="C"> 논리적으로 문제 해결 방안을 제시한다.</label>
+                    <label><input type="radio" name="q2" value="D"> 재미있는 이야기나 농담으로 분위기를 띄운다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">3. 학교 과제를 할 때, 당신은 주로 어떻게 접근하나요?</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="A"> 정해진 지시사항대로 정확하고 꼼꼼하게 처리한다.</label>
+                    <label><input type="radio" name="q3" value="B"> 새로운 아이디어를 추가하여 창의적으로 해결하려고 한다.</label>
+                    <label><input type="radio" name="q3" value="C"> 효율적인 방법을 찾아 빠르게 완성하려고 한다.</label>
+                    <label><input type="radio" name="q3" value="D"> 친구들과 협력하여 함께 완성하는 것을 선호한다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">4. 시험 기간에 당신의 공부 스타일은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="A"> 계획을 철저히 세우고 그대로 실천한다.</label>
+                    <label><input type="radio" name="q4" value="B"> 필요할 때마다 유동적으로 계획을 조절한다.</label>
+                    <label><input type="radio" name="q4" value="C"> 중요 내용 위주로 요약하며 효율적으로 공부한다.</label>
+                    <label><input type="radio" name="q4" value="D"> 친구들과 스터디 그룹을 만들어 함께 공부한다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">5. 새로운 게임이 출시되었을 때, 당신의 반응은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="A"> 사전 정보를 철저히 조사하고 공략법을 먼저 찾아본다.</label>
+                    <label><input type="radio" name="q5" value="B"> 일단 해보고 재미있으면 계속하고 아니면 그만둔다.</label>
+                    <label><input type="radio" name="q5" value="C"> 친구들과 함께 플레이할지 먼저 상의해본다.</label>
+                    <label><input type="radio" name="q5" value="D"> 게임 스토리나 캐릭터 설정에 깊이 빠져든다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">6. 친구가 고민을 이야기할 때, 당신은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q6" value="A"> 객관적인 입장에서 논리적인 해결책을 제시한다.</label>
+                    <label><input type="radio" name="q6" value="B"> 친구의 감정에 공감하고 위로해준다.</label>
+                    <label><input type="radio" name="q6" value="C"> 직접적인 도움을 줄 수 있는 방법을 찾아본다.</label>
+                    <label><input type="radio" name="q6" value="D"> 함께 새로운 활동을 하면서 기분 전환을 시켜준다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">7. 여행 계획을 세운다면, 당신은 어떤 스타일인가요?</p>
+                <div class="options">
+                    <label><input type="radio" name="q7" value="A"> 모든 일정을 상세하게 계획하고 그대로 따른다.</label>
+                    <label><input type="radio" name="q7" value="B"> 대략적인 방향만 정하고 즉흥적으로 움직인다.</label>
+                    <label><input type="radio" name="q7" value="C"> 맛집이나 유명 관광지 위주로 효율적인 동선을 짠다.</label>
+                    <label><input type="radio" name="q7" value="D"> 조용하고 평화로운 곳에서 힐링하는 것을 선호한다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">8. 새로운 친구를 사귈 때, 당신은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q8" value="A"> 먼저 다가가 말을 걸고 적극적으로 친해지려고 노력한다.</label>
+                    <label><input type="radio" name="q8" value="B"> 상대방이 먼저 다가오기를 기다리는 편이다.</label>
+                    <label><input type="radio" name="q8" value="C"> 공통 관심사를 찾아 심도 깊은 대화를 시도한다.</label>
+                    <label><input type="radio" name="q8" value="D"> 여러 친구들과 함께 어울리며 자연스럽게 친해진다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">9. 인터넷에서 정보를 찾을 때, 당신은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q9" value="A"> 정확하고 객관적인 사실 위주로 찾아본다.</label>
+                    <label><input type="radio" name="q9" value="B"> 다양한 의견과 해석을 폭넓게 찾아본다.</label>
+                    <label><input type="radio" name="q9" value="C"> 핵심적인 내용만 빠르게 파악하려고 한다.</label>
+                    <label><input type="radio" name="q9" value="D"> 이미지나 동영상 자료를 더 선호한다.</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="question">10. 미래의 직업을 선택할 때, 가장 중요하게 생각하는 것은?</p>
+                <div class="options">
+                    <label><input type="radio" name="q10" value="A"> 안정적인 수입과 확실한 미래 전망</label>
+                    <label><input type="radio" name="q10" value="B"> 흥미와 재능을 발휘할 수 있는 창의적인 일</label>
+                    <label><input type="radio" name="q10" value="C"> 사회에 긍정적인 영향을 줄 수 있는 보람 있는 일</label>
+                    <label><input type="radio" name="q10" value="D"> 다양한 사람들과 협력하고 소통하는 일</label>
+                </div>
+            </div>
+
+            <button type="submit">나의 추천 유형 알아보기</button>
+        </form>
+
+        <div id="result">
+            <h2>당신의 추천 유형은 <span id="mbti-type"></span>입니다!</h2>
+            <p id="mbti-description"></p>
+            <div id="recommended-items">
+                <h3>💖 당신에게 추천하는 아이템! 💖</h3>
+                <ul class="item-list" id="item-list">
+                    </ul>
+            </div>
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle icon"></i> <div>
+                    <strong>잠깐! 이 추천이 과연 나만을 위한 걸까요? 🧐</strong><br>
+                    우리가 인터넷에서 하는 활동들은 모두 **개인 정보**로 기록될 수 있어요. 📱 여러분이 클릭한 광고, 시청한 유튜브 영상, 검색한 내용들까지! 🕵️‍♀️ 이 정보들이 모여 우리의 '취향'을 분석하고, 위에서처럼 **맞춤형 추천**을 제공합니다. ✨ 편리해 보이지만, 이런 추천들이 때로는 우리가 보고 싶은 것만 보게 하거나, 원치 않는 방향으로 우리를 유도할 수도 있다는 점을 기억해야 합니다. ⚠️
+                    우리는 이 프로그램을 위해 단 10가지 질문만 했지만, 실제 서비스들은 여러분의 동의 없이도 훨씬 더 많은 정보를 수집하고 있을 수 있습니다. 🤫
+                    **알고리즘이 주는 추천을 무조건적으로 믿기보다는, 왜 나에게 이런 추천이 오는지 비판적으로 생각해보고, 다양한 정보를 찾아보는 자세를 갖는 것이 중요합니다. 💡**
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('recommendation-test').addEventListener('submit', function(event) {
+            event.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+
+            const answers = {};
+            for (let i = 1; i <= 10; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) {
+                    alert('모든 질문에 답해주세요!');
+                    return;
+                }
+                answers[`q${i}`] = selected.value;
+            }
+
+            const counts = { A: 0, B: 0, C: 0, D: 0 };
+            for (const key in answers) {
+                counts[answers[key]]++;
+            }
+
+            let typeCode = '';
+            let maxCount = 0;
+            const maxTypes = []; // 동점인 유형들을 저장할 배열
+
+            for (const code in counts) {
+                if (counts[code] > maxCount) {
+                    maxCount = counts[code];
+                    maxTypes.length = 0; // 더 큰 값이 나오면 이전 내용 초기화
+                    maxTypes.push(code);
+                } else if (counts[code] === maxCount) {
+                    maxTypes.push(code); // 동점이면 추가
+                }
+            }
+
+            // 동점인 유형이 여러 개일 경우, 이들을 모두 고려하여 복합 유형으로 정의
+            if (maxTypes.length === 1) {
+                typeCode = maxTypes[0];
+            } else {
+                // 여러 유형이 동점일 경우, 가중치를 주거나 특정 규칙에 따라 최종 유형을 정할 수 있지만
+                // 여기서는 가장 많이 나온 유형들을 모두 포함하는 복합적인 메시지를 생성하도록 함
+                typeCode = maxTypes.sort().join(''); // 알파벳 순서로 정렬하여 결합 (예: AB, ACD)
+            }
+
+            let mbtiType = '';
+            let mbtiDescription = '';
+            let recommendedItems = [];
+
+            // 10대에게 친숙한 가상의 유형 및 추천 아이템 정의
+            // typeCode에 따라 다양한 조합의 결과와 추천을 제공할 수 있도록 확장
+            const typeData = {
+                'A': {
+                    type: '집콕 장인 🏠 (House Explorer)',
+                    desc: '당신은 집에서 편안하게 자신만의 시간을 즐기는 것을 선호합니다. 온라인 세상에서 새로운 재미를 발견하는 데 능숙하군요!',
+                    items: [
+                        '인기 웹툰/웹소설 정주행 이용권 📖',
+                        '최신 게임 아이템 또는 할인 쿠폰 🎮',
+                        '스트리밍 서비스 (넷플릭스, 디즈니+ 등) 프리미엄 이용권 🎬',
+                        '편안한 게이밍 의자 또는 빈백 🛋️',
+                        '나만의 비밀 아지트 만들기 DIY 키트 🛠️'
+                    ]
+                },
+                'B': {
+                    type: '인싸 핵인싸 ✨ (Social Butterfly)',
+                    desc: '당신은 친구들과 어울리고 새로운 사람들을 만나는 것을 즐깁니다. 함께 활동하며 에너지를 얻는 타입이군요!',
+                    items: [
+                        '친구들과 함께 갈 수 있는 방탈출/보드게임 카페 이용권 🧩',
+                        '최신 유행 패션 아이템 (친구들과 시밀러룩) 👕👖',
+                        '인생샷 건질 수 있는 핫플레이스 탐방 지도 🗺️',
+                        '단체 채팅방 이모티콘 세트 😂',
+                        '인기 아이돌 굿즈 또는 콘서트 티켓 🎤'
+                    ]
+                },
+                'C': {
+                    type: '뇌섹러 🧠 (Brainy Seeker)',
+                    desc: '당신은 지적인 호기심이 많고, 새로운 지식을 탐구하며 성장하는 것을 중요하게 생각합니다. 논리적이고 효율적인 것을 추구하는군요!',
+                    items: [
+                        '온라인 코딩/프로그래밍 강좌 수강권 💻',
+                        '베스트셀러 자기계발 도서 또는 인문학 서적 📚',
+                        '다큐멘터리 채널 구독권 (역사, 과학 등) 🔬',
+                        '뇌지컬 게임 앱 (스도쿠, 멘사 퍼즐 등) 🔢',
+                        '효율적인 학습을 위한 태블릿/스마트 기기 📱'
+                    ]
+                },
+                'D': {
+                    type: '감성 파워 💖 (Empathetic Creator)',
+                    desc: '당신은 따뜻한 마음으로 다른 사람의 감정에 공감하고, 예술적이고 감성적인 것에 관심이 많습니다. 자신을 표현하는 것을 즐기는 타입이군요!',
+                    items: [
+                        '감성 돋는 필름 카메라 또는 다이어리 📸📝',
+                        '최신 인기 드라마/영화 스트리밍 이용권 🎬',
+                        '나만의 플레이리스트 만들기 앱 (유료 구독권) 🎧',
+                        '미술/공예 재료 세트 (드로잉, 점토 등) 🎨',
+                        '친구 생일 선물 추천 BEST 10 리스트 🎁'
+                    ]
+                }
+            };
+
+            // 동점인 경우의 메시지 처리 (예시)
+            if (maxTypes.length > 1) {
+                mbtiType = '복합형 추천자 🔄';
+                mbtiDescription = '당신은 여러 유형의 특징을 고루 가지고 있는 복합적인 성격의 소유자입니다. 상황에 따라 다양한 모습을 보여주는군요!';
+                // 동점인 유형들의 아이템을 모두 합쳐서 보여줌
+                maxTypes.forEach(code => {
+                    if (typeData[code]) {
+                        recommendedItems = recommendedItems.concat(typeData[code].items);
+                    }
+                });
+                // 중복 제거 (선택 사항)
+                recommendedItems = [...new Set(recommendedItems)];
+            } else if (typeData[typeCode]) {
+                mbtiType = typeData[typeCode].type;
+                mbtiDescription = typeData[typeCode].desc;
+                recommendedItems = typeData[typeCode].items;
+            } else {
+                mbtiType = '알 수 없음 🤷‍♀️';
+                mbtiDescription = '답변을 다시 확인해 주세요. 또는 당신은 아직 어떤 유형으로도 정의할 수 없는 무한한 가능성을 지닌 존재일지도 모릅니다! 🌈';
+                recommendedItems = [
+                    '다양한 분야의 베스트셀러 목록 📚',
+                    '새로운 취미를 찾기 위한 체험 클래스 할인 🤸‍♀️',
+                    '세상의 다양한 직업 탐색 가이드 🧑‍💻',
+                    '알 수 없는 알고리즘의 작동 방식에 대한 영상 🧐',
+                    '나만의 특별한 하루를 위한 랜덤 박스 🎁'
+                ];
+            }
+
+            document.getElementById('mbti-type').textContent = mbtiType;
+            document.getElementById('mbti-description').textContent = mbtiDescription;
+
+            const itemList = document.getElementById('item-list');
+            itemList.innerHTML = ''; // 기존 아이템 초기화
+            recommendedItems.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                itemList.appendChild(li);
+            });
+
+            document.getElementById('result').style.display = 'block'; // 결과 표시
+        });
+    </script>
+</body>
+</html>
