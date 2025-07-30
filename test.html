@@ -12,11 +12,14 @@
             background-color: #f4f7f6;
             color: #333;
             line-height: 1.6;
-            margin: 0;
-            padding: 20px;
+            margin: 0; /* 기본 마진 제거 */
+            padding-top: 0; /* 상단 패딩 제거 */
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 50px; /* 하단에 여백 추가 (원하는 만큼 조절) */
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* 콘텐츠가 위에서 시작하도록 변경 */
             min-height: 100vh;
         }
         .container {
@@ -27,6 +30,8 @@
             max-width: 800px;
             width: 100%;
             box-sizing: border-box;
+            margin-top: 20px; /* body의 align-items: flex-start와 함께 상단에 약간의 여백을 줘서 콘텐츠가 너무 붙지 않게 함 */
+            margin-bottom: 20px; /* 컨테이너 자체의 하단 여백도 추가 */
         }
         h1 {
             color: #2c3e50;
