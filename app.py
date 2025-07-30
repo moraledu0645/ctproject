@@ -76,8 +76,19 @@ with col1:
         components.html(html_test, height=4500)
 
 with col2:
-    with st.expander('Tips..'):
-        st.info('Tips..')
+    with st.expander('💡 컴퓨팅 사고(Computational Thinking)란?'):
+        st.info("""
+    **컴퓨팅 사고(Computational Thinking, CT)**는 컴퓨터 과학자뿐만 아니라 누구나 배워서 활용할 수 있는 보편적인 문제 해결 방식입니다. 복잡한 문제를 컴퓨터가 효과적으로 처리할 수 있도록 정의하고 해결하는 사고 과정 전반을 의미합니다.
+
+    주요 구성 요소는 다음과 같습니다:
+
+    * **분해 (Decomposition)**: 복잡한 문제를 작고 다루기 쉬운 부분으로 나눕니다.
+    * **패턴 인식 (Pattern Recognition)**: 문제나 데이터에서 반복되는 규칙, 경향, 공통적인 특성을 찾아냅니다.
+    * **추상화 (Abstraction)**: 불필요한 세부 사항을 제거하고 문제의 핵심적인 요소를 추출하여 단순화합니다.
+    * **알고리즘 (Algorithms)**: 문제를 해결하기 위한 단계적이고 논리적인 절차를 설계합니다.
+
+    이러한 컴퓨팅 사고는 디지털 시대에 필요한 사고력, 문제 해결 능력, 그리고 창의력을 기르는 데 중요한 역할을 합니다. 단순히 코딩 기술을 배우는 것을 넘어, 어떤 분야에서든 논리적이고 효율적으로 문제를 해결하는 데 활용될 수 있습니다.
+    """)
 
 st.markdown('<hr>', unsafe_allow_html=True)
 st.write('<font color="BLUE">(c)copyright. all rights reserved by jia', unsafe_allow_html=True)

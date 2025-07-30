@@ -61,6 +61,13 @@
       border-radius: 8px;
     }
 
+    .score-display {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c7be5;
+        margin-bottom: 5px;
+    }
+
     .stars {
       font-size: 24px;
       color: gold;
@@ -200,7 +207,7 @@
   </form>
 
   <div id="result" style="display: none;">
-    <strong>📊 평균 신뢰도 점수:</strong>
+    <strong>📊 평균 신뢰도 점수: <span id="averageScoreDisplay" class="score-display"></span>점</strong>
     <div class="stars" id="stars"></div>
     <div id="feedback"></div>
   </div>
@@ -217,23 +224,28 @@
       let total = 0;
       inputs.forEach(input => total += parseInt(input.value));
       let average = total / 7;
+
+      // 평균 점수를 소수점 둘째 자리까지 표시
+      document.getElementById("averageScoreDisplay").innerText = average.toFixed(2);
       document.getElementById("result").style.display = "block";
       document.getElementById("stars").innerHTML = renderStars(average);
 
       let feedback = '';
       if (average >= 4.5) {
-        feedback = "✅ 매우 신뢰할 수 있는 정보입니다.";
+        feedback = "✨ **최고 수준의 신뢰도!** 매우 믿을 수 있는 정보입니다. 다양한 측면에서 검증된 고품질 정보로 판단됩니다.";
+      } else if (average >= 4.0) {
+        feedback = "✅ **높은 신뢰도!** 대체로 신뢰할 수 있는 정보입니다. 핵심적인 내용들은 믿어도 좋지만, 필요한 경우 교차 확인을 고려해 보세요.";
       } else if (average >= 3.5) {
-        feedback = "🔷 신뢰할 수 있는 정보입니다.";
-      } else if (average >= 2.5) {
-        feedback = "⚠️ 어느 정도 신뢰할 수 있지만, 주의가 필요합니다.";
-      } else if (average >= 1.5) {
-        feedback = "❗ 신뢰하기 어려운 정보일 수 있으니 추가 확인이 필요합니다.";
+        feedback = "🔷 **보통 수준의 신뢰도.** 어느 정도 신뢰할 수 있지만, 주의 깊게 살펴볼 필요가 있습니다. 정보의 출처나 근거를 한 번 더 확인해 보세요.";
+      } else if (average >= 3.0) {
+        feedback = "⚠️ **주의 필요.** 신뢰도가 다소 낮습니다. 정보의 내용이나 출처에 의문이 제기될 수 있으므로, 다른 신뢰할 수 있는 정보를 반드시 추가로 확인해야 합니다.";
+      } else if (average >= 2.0) {
+        feedback = "❗ **낮은 신뢰도.** 이 정보는 신뢰하기 어렵습니다. 잘못되었거나 편향된 내용일 가능성이 높으니, 이 정보를 기반으로 중요한 판단을 내리는 것은 위험합니다.";
       } else {
-        feedback = "🚫 신뢰할 수 없는 정보입니다. 다른 출처를 꼭 확인하세요.";
+        feedback = "🚫 **매우 낮은 신뢰도.** 거의 신뢰할 수 없는 정보입니다. 허위 정보나 오해를 유발할 수 있으니, 즉시 다른 출처를 찾아 진위를 확인해야 합니다.";
       }
 
-      document.getElementById("feedback").innerText = feedback;
+      document.getElementById("feedback").innerHTML = feedback; // innerHTML로 변경하여 볼드 처리 적용
     }
 
     function renderStars(score) {
@@ -250,6 +262,8 @@
     document.getElementById('link').addEventListener('change', function () {
       const url = this.value.trim();
       if (url) {
+        // 보안상의 이유로 외부 URL의 iframe 미리보기는 제한될 수 있습니다.
+        // Same-origin policy (동일 출처 정책) 때문에 많은 웹사이트가 iframe 내 로드를 허용하지 않습니다.
         document.getElementById("iframe").src = url;
         document.getElementById("preview").style.display = "block";
       } else {

@@ -36,107 +36,308 @@
   <h1>햄버거 완성품 예측하기 🍔</h1>
   <h2>대상 및 교과: 중1 (논리적사고)</h2>
 
-  <div class="rule-box">
-<규칙>
-가. 빵 위에는 반드시 소스가 올라감. (단, 덮개 빵 제외)
-나. 토마토는 고기보다는 위, 치즈보다는 아래에 있음.
-다. 양파는 고기와 토마토 사이에 있음.
-라. 고기는 양상추 위에 올라감.
-마. 모든 재료 위에 덮개 빵이 올라가야 함.
-  </div>
+  <div class="rule-box" id="rulesDisplay">
+    </div>
 
   <label>사용할 재료 선택 (아래에서 위 순서로 선택):</label><br>
   <div id="selectors"></div>
 
   <br><br>
   <button onclick="checkBurger()">문제 풀기</button>
+  <button onclick="generateNewProblem()">새로운 문제 생성</button>
 
   <div class="output" id="result"></div>
 
   <script>
-    const ingredients = [
-      { label: "선택", value: "" },
+    const allAvailableIngredients = [
       { label: "양상추 🥬", value: "양상추" },
       { label: "고기(패티) 🥩", value: "고기" },
       { label: "치즈 🧀", value: "치즈" },
       { label: "토마토 🍅", value: "토마토" },
       { label: "양파 🧅", value: "양파" },
       { label: "소스 🥫", value: "소스" },
+      { label: "버섯 🍄", value: "버섯" },
+      { label: "새우 🍤", value: "새우" },
+      { label: "치킨 🍗", value: "치킨" },
+      { label: "할라피뇨 🌶️", value: "할라피뇨" }
+    ];
+
+    const fixedIngredients = [
       { label: "빵 🍞", value: "빵" },
       { label: "덮개빵 🍞", value: "덮개빵" }
     ];
 
     const container = document.getElementById("selectors");
+    const rulesDisplay = document.getElementById("rulesDisplay");
+    let currentRules = [];
+    let currentCorrectAnswer = [];
+    let currentSelectedIngredients = []; // 현재 문제에 사용될 8가지 재료 (라벨 포함)
 
-    for (let i = 1; i <= 8; i++) {
-      const select = document.createElement("select");
-      select.id = "ingredient" + i;
+    const totalBurgerLayers = 8; // 총 8개 재료만 사용
 
-      ingredients.forEach(ing => {
-        const option = document.createElement("option");
-        option.value = ing.value;
-        option.textContent = ing.label;
-        select.appendChild(option);
-      });
-
-      container.appendChild(select);
+    // 배열 섞기 함수
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
+
+    // 셀렉터 초기화 함수 (문제 생성 시마다 재료 목록 업데이트)
+    function initializeSelectors() {
+      container.innerHTML = ''; // 기존 셀렉터 모두 제거
+
+      const fullIngredientListForSelectors = [{ label: "선택", value: "" }, ...currentSelectedIngredients];
+
+      for (let i = 1; i <= totalBurgerLayers; i++) {
+        const select = document.createElement("select");
+        select.id = "ingredient" + i;
+        fullIngredientListForSelectors.forEach(ing => {
+          const option = document.createElement("option");
+          option.value = ing.value;
+          option.textContent = ing.label;
+          select.appendChild(option);
+        });
+        container.appendChild(select);
+      }
+    }
+
+    function generateNewProblem() {
+      currentRules = [];
+      let ruleText = "<규칙>\n";
+      let ruleCounter = 0;
+
+      // 1. 8개의 재료를 무작위로 선택합니다.
+      // 빵, 덮개빵, 소스를 포함하여 8개. 소스는 이제 고정 재료가 아님.
+      // '빵'과 '덮개빵'은 항상 포함되므로, 6개의 재료만 추가로 선택합니다.
+      const otherIngredients = allAvailableIngredients.filter(ing => ing.value !== "소스"); // 소스를 제외한 나머지 재료
+      
+      const shuffledOtherIngredients = shuffleArray([...otherIngredients]);
+      const selectedDynamicIngredients = shuffledOtherIngredients.slice(0, 5); // 5개만 선택 (소스 포함해서 총 6개)
+
+      // 최종 8개 재료 목록 구성: 빵, 덮개빵, 소스, 그리고 무작위 5개 재료
+      currentSelectedIngredients = [
+          ...fixedIngredients, // 빵, 덮개빵
+          { label: "소스 🥫", value: "소스" }, // 소스는 이제 필수 포함 (8개 중 3개)
+          ...selectedDynamicIngredients // 무작위 5개 재료 (8개 중 5개)
+      ];
+
+      // 겹치지 않는 순열을 만들기 위한 헬퍼 함수
+      function generatePermutations(arr) {
+          if (arr.length === 0) return [[]];
+          if (arr.length === 1) return [arr];
+
+          const result = [];
+          for (let i = 0; i < arr.length; i++) {
+              const head = arr[i];
+              const rest = arr.slice(0, i).concat(arr.slice(i + 1));
+              for (const p of generatePermutations(rest)) {
+                  result.push([head, ...p]);
+              }
+          }
+          return result;
+      }
+
+      // 2. 선택된 8개 재료로 가능한 모든 버거 순열을 생성합니다.
+      const ingredientsForPermutation = currentSelectedIngredients.map(ing => ing.value);
+      const allPossiblePermutations = generatePermutations(ingredientsForPermutation);
+
+      // 빵과 덮개빵이 맨 아래와 맨 위에 고정된 유효한 순열만 필터링합니다.
+      const validPermutations = allPossiblePermutations.filter(perm =>
+          perm[0] === "빵" && perm[totalBurgerLayers - 1] === "덮개빵"
+      );
+      
+      // 만약 유효한 순열이 없다면 다시 시도합니다. (이런 경우는 거의 없겠지만, 만약을 대비)
+      if (validPermutations.length === 0) {
+          console.warn("[경고] 유효한 햄버거 순열을 찾을 수 없습니다. 다시 시도합니다.");
+          generateNewProblem(); // 재귀 호출로 다시 문제 생성 시도
+          return;
+      }
+
+      // 필터링된 유효한 순열 중 하나를 정답으로 선택합니다.
+      currentCorrectAnswer = shuffleArray(validPermutations)[0];
+      const solutionIdx = (item) => currentCorrectAnswer.indexOf(item);
+
+      // 3. 고정된 필수 규칙을 추가합니다.
+      // 규칙 1: 맨 아래는 반드시 '빵', 맨 위는 반드시 '덮개빵' (이것은 이미 validPermutations에 의해 보장되지만, 규칙으로 명시)
+      currentRules.push({
+        validation: (selected, idx) => selected[0] === "빵" && selected[selected.length - 1] === "덮개빵",
+        errorMsg: "❌ 규칙: 맨 아래에는 빵, 맨 위에는 덮개빵이 있어야 합니다."
+      });
+      ruleText += `${koreanAlphabet[ruleCounter++]}. 맨 아래에는 빵, 맨 위에는 덮개빵이 있어야 합니다.\n`; // 가.
+
+      // 4. 선택된 정답에 따라 동적 규칙을 생성합니다.
+      // 동적 규칙에 사용될 재료 (빵, 덮개빵 제외)
+      const dynamicIngredients = currentCorrectAnswer.filter(ing =>
+        ing !== "빵" && ing !== "덮개빵"
+      );
+
+      // 목표로 하는 동적 규칙의 개수 (최소 4개 ~ 최대 8개)
+      const minDynamicRules = 4;
+      const maxDynamicRules = 8;
+      let desiredDynamicRulesCount = Math.floor(Math.random() * (maxDynamicRules - minDynamicRules + 1)) + minDynamicRules;
+
+      const possibleUniqueRuleCombinations = [];
+      const tempRuleTextSet = new Set(); // 텍스트 중복 검사용 Set
+
+      // 모든 '위에/아래에' 관계 규칙 조합 생성
+      for (let i = 0; i < dynamicIngredients.length; i++) {
+        const ingA = dynamicIngredients[i];
+        for (let j = i + 1; j < dynamicIngredients.length; j++) {
+          const ingB = dynamicIngredients[j];
+
+          const idxA = solutionIdx(ingA);
+          const idxB = solutionIdx(ingB);
+
+          if (idxA === -1 || idxB === -1) continue; 
+
+          let rule = null;
+          if (idxB < idxA) { // B가 A보다 아래에 있다면 (A가 B 위에 있음)
+            rule = {
+              text: `${ingA}은(는) ${ingB} 위에 있어야 합니다.`,
+              validation: (selected, currentSelectedIdx) => currentSelectedIdx(ingB) < currentSelectedIdx(ingA),
+              errorMsg: `❌ 규칙: ${ingA}은(는) ${ingB} 위에 있어야 합니다.`
+            };
+          } else if (idxA < idxB) { // A가 B보다 아래에 있다면 (B가 A 위에 있음)
+            rule = {
+              text: `${ingB}은(는) ${ingA} 위에 있어야 합니다.`,
+              validation: (selected, currentSelectedIdx) => currentSelectedIdx(ingA) < currentSelectedIdx(ingB),
+              errorMsg: `❌ 규칙: ${ingB}은(는) ${ingA} 위에 있어야 합니다.`
+            };
+          }
+
+          if (rule && !tempRuleTextSet.has(rule.text)) {
+            possibleUniqueRuleCombinations.push(rule);
+            tempRuleTextSet.add(rule.text);
+          }
+        }
+      }
+
+      // 모든 '사이에' 관계 규칙 조합 생성
+      if (dynamicIngredients.length >= 3) {
+        for (let i = 0; i < dynamicIngredients.length; i++) {
+          const ingA = dynamicIngredients[i];
+          for (let j = i + 1; j < dynamicIngredients.length; j++) {
+            const ingB = dynamicIngredients[j];
+            for (let k = j + 1; k < dynamicIngredients.length; k++) {
+              const ingC = dynamicIngredients[k];
+
+              const idxA = solutionIdx(ingA);
+              const idxB = solutionIdx(ingB);
+              const idxC = solutionIdx(ingC);
+
+              if (idxA === -1 || idxB === -1 || idxC === -1) continue;
+
+              const sortedByPos = [
+                  { ing: ingA, idx: idxA },
+                  { ing: ingB, idx: idxB },
+                  { ing: ingC, idx: idxC }
+              ].sort((x, y) => x.idx - y.idx);
+
+              const middleIng = sortedByPos[1].ing;
+              const outer1 = sortedByPos[0].ing;
+              const outer2 = sortedByPos[2].ing;
+
+              const rule = {
+                  text: `${middleIng}은(는) ${outer1}와 ${outer2} 사이에 있어야 합니다.`,
+                  validation: (selected, currentSelectedIdx) => {
+                      const iM = currentSelectedIdx(middleIng), iO1 = currentSelectedIdx(outer1), iO2 = currentSelectedIdx(outer2);
+                      if (iM === -1 || iO1 === -1 || iO2 === -1) return false;
+                      return (iO1 < iM && iM < iO2) || (iO2 < iM && iM < iO1);
+                  },
+                  errorMsg: `❌ 규칙: ${middleIng}은(는) ${outer1}와 ${outer2} 사이에 있어야 합니다.`
+              };
+
+              if (!tempRuleTextSet.has(rule.text)) {
+                possibleUniqueRuleCombinations.push(rule);
+                tempRuleTextSet.add(rule.text);
+              }
+            }
+          }
+        }
+      }
+      
+      // 실제 생성 가능한 고유 규칙의 개수를 넘지 않도록 목표 개수 조정
+      desiredDynamicRulesCount = Math.min(desiredDynamicRulesCount, possibleUniqueRuleCombinations.length);
+
+
+      // 생성 가능한 고유 규칙 조합을 섞은 후, 원하는 개수만큼 선택합니다.
+      const shuffledUniquePossibleRules = shuffleArray(possibleUniqueRuleCombinations);
+      
+      for (let i = 0; i < shuffledUniquePossibleRules.length && currentRules.length < (desiredDynamicRulesCount + 1); i++) { // +1은 고정 규칙 1개
+        const ruleToAdd = shuffledUniquePossibleRules[i];
+        
+        currentRules.push({
+          validation: ruleToAdd.validation,
+          errorMsg: ruleToAdd.errorMsg
+        });
+        ruleText += `${koreanAlphabet[ruleCounter++]}. ${ruleToAdd.text}\n`;
+      }
+
+      // 만약 원하는 개수만큼 규칙을 채우지 못했더라도 루프는 종료됩니다.
+      if (currentRules.length < (desiredDynamicRulesCount + 1)) {
+         console.warn(`[경고] 목표 규칙 개수(${desiredDynamicRulesCount + 1})를 채우지 못했습니다. 현재 규칙 개수: ${currentRules.length}`);
+      }
+
+      ruleText += "</규칙>";
+      rulesDisplay.innerHTML = ruleText;
+      document.getElementById("result").innerHTML = ""; // 이전 결과 지우기
+      
+      // 문제에 사용될 재료 목록으로 셀렉터 업데이트
+      initializeSelectors();
+    }
+
+    // 규칙 번호 매기기를 위한 한글 자모
+    const koreanAlphabet = ['가', '나', '다', '라', '마', '바', '사', '아', '자', '차', '카', '타', '파', '하', '거', '너', '더', '러', '머', '버', '서', '어', '저', '처', '커', '터', '퍼', '허'];
 
     function checkBurger() {
       const selected = [];
-      for (let i = 1; i <= 8; i++) {
+      for (let i = 1; i <= totalBurgerLayers; i++) {
         const val = document.getElementById("ingredient" + i).value;
         if (val) selected.push(val);
       }
 
-      const idx = (item) => selected.indexOf(item);
-      const msg = [];
-
-      const required = ["양상추", "고기", "치즈", "토마토", "양파", "소스", "빵", "덮개빵"];
+      // 현재 문제에 사용되는 재료들만 가지고 유효성 검사
+      const currentProblemIngredients = currentSelectedIngredients.map(ing => ing.value);
       const counts = {};
 
       selected.forEach(item => {
         counts[item] = (counts[item] || 0) + 1;
       });
 
-      required.forEach(item => {
+      const idx = (item) => selected.indexOf(item);
+      const msg = [];
+
+      // 모든 필수 재료가 사용되었는지, 중복 사용은 없는지 확인
+      currentProblemIngredients.forEach(item => {
         if (!counts[item]) {
           msg.push(`❌ 필수 재료 누락: ${item} 이(가) 빠졌습니다.`);
         } else if (counts[item] > 1) {
           msg.push(`❌ 재료 중복 사용: ${item} 이(가) ${counts[item]}번 사용되었습니다.`);
         }
       });
-
-      if (selected[selected.length - 1] !== "덮개빵")
-        msg.push("❌ 규칙 마: 덮개빵이 맨 위에 있어야 합니다.");
-
-      if (idx("고기") < idx("양상추"))
-        msg.push("❌ 규칙 라: 고기는 양상추 위에 있어야 합니다.");
-
-      if (idx("치즈") >= 0 && idx("토마토") >= 0 && idx("고기") >= 0) {
-        if (!(idx("고기") < idx("토마토") && idx("토마토") < idx("치즈"))) {
-          msg.push("❌ 규칙 나: 토마토는 고기보다 위, 치즈보다 아래에 있어야 합니다.");
-        }
+      
+      // 정확히 모든 레이어 수만큼 재료가 선택되었는지 확인
+      if (selected.length !== totalBurgerLayers) {
+          msg.push(`❌ 모든 ${totalBurgerLayers}칸에 재료를 선택해야 합니다.`);
       }
 
-      if (idx("고기") >= 0 && idx("토마토") >= 0 && idx("양파") >= 0) {
-        const iG = idx("고기"), iT = idx("토마토"), iO = idx("양파");
-        if (!((iG < iO && iO < iT) || (iT < iO && iO < iG))) {
-          msg.push("❌ 규칙 다: 양파는 고기와 토마토 사이에 있어야 합니다.");
+      // 현재 생성된 규칙들에 따라 유효성 검사
+      currentRules.forEach(rule => {
+        if (!rule.validation(selected, idx)) {
+          msg.push(rule.errorMsg);
         }
-      }
-
-      for (let i = 0; i < selected.length - 1; i++) {
-        if (selected[i] === "빵" && selected[i + 1] !== "소스") {
-          msg.push("❌ 규칙 가: 빵 위에는 반드시 소스가 있어야 합니다.");
-        }
-      }
+      });
 
       const resultBox = document.getElementById("result");
-      resultBox.innerHTML = msg.length === 0 
-        ? "✅ 정답입니다! 햄버거 완성!" 
+      resultBox.innerHTML = msg.length === 0
+        ? "✅ 정답입니다! 햄버거 완성!"
         : msg.join("<br>");
     }
+
+    // 초기 로딩 시 문제 생성
+    generateNewProblem();
   </script>
 
 </body>
