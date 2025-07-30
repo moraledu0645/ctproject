@@ -1,121 +1,225 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>오레오 문제 - CT 사고력</title>
-  <style>
-    body {
-      font-family: "Arial", sans-serif;
-      background-color: #f0f0f0;
-      padding: 30px;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <title>오레오 문제 - CT 사고력</title>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            background-color: #FFFACD; /* 연노랑색 - LemonChiffon */
+            padding: 30px;
+            text-align: center;
+        }
 
-    .container {
-      background-color: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 1000px;
-      margin: auto;
-    }
+        .container {
+            background-color: #FFFFF0; /* 연노랑색 - Ivory */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
 
-    .image-row {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
+        .image-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-    .image-box {
-      flex: 1;
-      min-width: 300px;
-    }
+        .image-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .image-box img {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
+        .image-box img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
 
-    input[type="text"] {
-      font-size: 18px;
-      padding: 10px;
-      margin-top: 20px;
-      width: 300px;
-    }
+        /* 캔버스 스타일 */
+        #problemCanvas {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+            background-color: #FFFFF0; /* 캔버스 배경색 - Ivory */
+        }
 
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
+        input[type="text"] {
+            font-size: 18px;
+            padding: 10px;
+            margin-top: 20px;
+            width: 300px;
+        }
 
-    .result {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 10px;
+            cursor: pointer;
+            margin: 5px;
+        }
 
-    .correct {
-      color: green;
-    }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-    .incorrect {
-      color: red;
-    }
+        .correct {
+            color: green;
+        }
 
-    .label {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-  </style>
+        .incorrect {
+            color: red;
+        }
+
+        .label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>오레오 문제를 읽어보자!</h1>
-    <p>왼쪽 이미지를 참고하여 오른쪽 문제를 해석해 보세요.<br>문제에 들어갈 이름을 추론해 입력해 보세요.</p>
+    <div class="container">
+        <h1>오레오 문제를 읽어보자!</h1>
+        <p>왼쪽 이미지를 참고하여 오른쪽 문제를 해석해 보세요.<br>문제에 들어갈 이름을 추론해 입력해 보세요.</p>
 
-    <div class="image-row">
-      <div class="image-box">
-        <div class="label">📌 힌트 이미지</div>
-        <img src="image/oreo.jpeg" alt="오레오 힌트">
-      </div>
-      <div class="image-box">
-        <div class="label">🧩 문제 이미지</div>
-        <img src="image/problem.png" alt="오레오 문제">
-      </div>
+        <div class="image-row">
+            <div class="image-box">
+                <div class="label">📌 힌트 이미지</div>
+                <img src="image/oreo.jpeg" alt="오레오 힌트">
+            </div>
+            <div class="image-box">
+                <div class="label">🧩 문제 이미지</div>
+                <canvas id="problemCanvas" width="200" height="300"></canvas>
+            </div>
+        </div>
+
+        <div>
+            <button onclick="generateNewProblem()">새로운 문제 생성</button>
+            <br>
+            <input type="text" id="answer" placeholder="예: 오레오레오오레">
+            <br>
+            <button onclick="checkAnswer()">제출</button>
+        </div>
+
+        <div class="result" id="resultArea"></div>
     </div>
 
-    <div>
-      <input type="text" id="answer" placeholder="예: 오레오레오오레">
-      <br>
-      <button onclick="checkAnswer()">제출</button>
-    </div>
+    <script>
+        const canvas = document.getElementById('problemCanvas');
+        const ctx = canvas.getContext('2d');
+        let currentCorrectAnswer = "";
 
-    <div class="result" id="resultArea"></div>
-  </div>
+        // 둥근 사각형을 그리는 헬퍼 함수
+        function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+            if (typeof radius === 'number') {
+                radius = {tl: radius, tr: radius, br: radius, bl: radius};
+            } else {
+                radius = {...{tl: 0, tr: 0, br: 0, bl: 0}, ...radius};
+            }
+            ctx.beginPath();
+            ctx.moveTo(x + radius.tl, y);
+            ctx.lineTo(x + width - radius.tr, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+            ctx.lineTo(x + width, y + height - radius.br);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+            ctx.lineTo(x + radius.bl, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+            ctx.lineTo(x, y + radius.tl);
+            ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+            ctx.closePath();
+            if (fill) {
+                ctx.fill();
+            }
+            if (stroke) {
+                ctx.stroke();
+            }
+        }
 
-  <script>
-    function checkAnswer() {
-      const userAnswer = document.getElementById("answer").value.trim().replace(/\s/g, "");
-      const correctAnswer = "오오오레레오레레오오레오오오레오";
-      const result = document.getElementById("resultArea");
+        function generateNewProblem() {
+            const minLayers = 5;
+            const maxLayers = 18;
+            const numLayers = Math.floor(Math.random() * (maxLayers - minLayers + 1)) + minLayers;
 
-      if (userAnswer === "") {
-        result.textContent = "답을 입력해 주세요!";
-        result.className = "result incorrect";
-      } else if (userAnswer === correctAnswer) {
-        result.textContent = "🎉 축하합니다! 정답입니다 🎉";
-        result.className = "result correct";
-      } else {
-        result.textContent = "❌ 틀렸습니다! 다시 시도해보세요";
-        result.className = "result incorrect";
-      }
-    }
-  </script>
+            const verticalPaddingRatio = 0.15;
+            const paddingTopBottom = canvas.height * verticalPaddingRatio;
+            const drawableHeight = canvas.height - (2 * paddingTopBottom);
+
+            const layerHeight = drawableHeight / numLayers;
+
+            const cookieColor = "#000000"; // 검정색 (쿠키)
+            const creamColor = "#FFFFFF";  // 흰색 (크림)
+            const oreoMapping = {
+                [cookieColor]: "오",
+                [creamColor]: "레"
+            };
+
+            const cookieWidth = canvas.width;
+            const creamWidth = cookieWidth * 0.85;
+
+            const borderColor = "#333333"; // 테두리 색상 (진한 회색)
+            const borderWidth = 1;         // 테두리 두께
+            const borderRadius = 5;        // 모서리 둥글기 반경
+
+            let answerSequence = "";
+
+            // 캔버스 초기화
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 각 층 그리기
+            for (let i = 0; i < numLayers; i++) {
+                const isCookie = Math.random() < 0.5;
+                const currentColor = isCookie ? cookieColor : creamColor;
+                const currentWidth = isCookie ? cookieWidth : creamWidth;
+
+                const startX = (canvas.width - currentWidth) / 2;
+                const startY = paddingTopBottom + (i * layerHeight);
+                
+                // 도형 채우기
+                ctx.fillStyle = currentColor;
+                roundRect(ctx, startX, startY, currentWidth, layerHeight, borderRadius, true, false);
+
+                // 테두리 그리기
+                ctx.strokeStyle = borderColor;
+                ctx.lineWidth = borderWidth;
+                roundRect(ctx, startX, startY, currentWidth, layerHeight, borderRadius, false, true);
+
+                // 정답 문자열 생성
+                answerSequence += oreoMapping[currentColor];
+            }
+
+            currentCorrectAnswer = answerSequence;
+            document.getElementById("answer").value = "";
+            document.getElementById("resultArea").textContent = "";
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById("answer").value.trim().replace(/\s/g, "");
+            const result = document.getElementById("resultArea");
+
+            if (userAnswer === "") {
+                result.textContent = "답을 입력해 주세요!";
+                result.className = "result incorrect";
+            } else if (userAnswer === currentCorrectAnswer) {
+                result.textContent = "🎉 축하합니다! 정답입니다 🎉";
+                result.className = "result correct";
+            } else {
+                result.textContent = "❌ 틀렸습니다! 다시 시도해보세요";
+                result.className = "result incorrect";
+            }
+        }
+
+        // 페이지 로드 시 초기 문제 생성
+        generateNewProblem();
+    </script>
 </body>
 </html>
