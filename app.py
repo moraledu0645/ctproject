@@ -4,7 +4,7 @@ import base64
 import re
 
 st.set_page_config(layout='wide', page_title='CT problem solving program')
-st.markdown("<h1 style='text-align: center; color: black;'>This is Jia Webpage</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black;'>Moraledu World!</h1>", unsafe_allow_html=True)
 
 # --------------------
 # 이미지 Base64 인라인 변환 함수
