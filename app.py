@@ -54,14 +54,6 @@ with open('./test.html', 'r', encoding='utf-8') as f:
 col1, col2 = st.columns((4,1))
 
 with col1:
-    with st.expander('Content #1...'):
-        url = 'https://www.youtube.com/watch?v=XyEOEBsa8I4'
-        st.info('Content...')
-        st.video(url)
-
-    with st.expander('Image content...'):
-        imgfilepath = './image/gpt.png'
-        st.image(imgfilepath)
 
     with st.expander('hamburger maker!'):
         components.html(html_hamburger, height=700)
@@ -74,6 +66,15 @@ with col1:
     
     with st.expander('What type am I?'):
         components.html(html_test, height=4500)
+
+    with st.expander('Content #1...'):
+        url = 'https://www.youtube.com/watch?v=XyEOEBsa8I4'
+        st.info('Content...')
+        st.video(url)
+
+    with st.expander('Image content...'):
+        imgfilepath = './image/gpt.png'
+        st.image(imgfilepath)
 
 with col2:
     with st.expander('💡 컴퓨팅 사고(Computational Thinking)란?'):
